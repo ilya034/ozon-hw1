@@ -1,4 +1,4 @@
-namespace HomeWork1.Domain.Entities;
+namespace HomeWork1.Domain.Models;
 
 public class ClientOrderReport
 {

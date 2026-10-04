@@ -1,6 +1,6 @@
 using HomeWork1.Application.Abstractions;
 using HomeWork1.Application.Exceptions;
-using HomeWork1.Domain.Entities;
+using HomeWork1.Domain.Models;
 
 namespace HomeWork1.Application.Services;
 
