@@ -7,9 +7,6 @@ public class ConsoleReportWriter : IReportWriter
 {
     public void Write(IEnumerable<ClientOrderReport> reports)
     {
-        foreach (var report in reports)
-        {
-            Console.WriteLine(report);
-        }
+        foreach (var report in reports) Console.WriteLine(report);
     }
 }

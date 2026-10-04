@@ -8,6 +8,8 @@ public class ClientOrderReport
     public decimal OrdersSum { get; set; }
     public string FavoriteItemName { get; set; } = string.Empty;
 
-    public override string ToString() =>
-        $"{ClientId} {OrdersSum.ToString("F2", CultureInfo.InvariantCulture)} {FavoriteItemName}";
+    public override string ToString()
+    {
+        return $"{ClientId} {OrdersSum.ToString("F2", CultureInfo.InvariantCulture)} {FavoriteItemName}";
+    }
 }

@@ -3,7 +3,7 @@ namespace HomeWork1.Infrastructure.FileSystem;
 public static class PathLocator
 {
     /// <summary>
-    /// Ищет файл в текущей и родительских директориях.
+    ///     Ищет файл в текущей и родительских директориях.
     /// </summary>
     public static string? FindFileUpwards(string fileName)
     {
@@ -12,10 +12,7 @@ public static class PathLocator
         while (directory is not null)
         {
             var candidate = Path.Combine(directory.FullName, fileName);
-            if (File.Exists(candidate))
-            {
-                return candidate;
-            }
+            if (File.Exists(candidate)) return candidate;
 
             directory = directory.Parent;
         }

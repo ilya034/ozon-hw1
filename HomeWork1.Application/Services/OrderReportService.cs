@@ -20,9 +20,7 @@ public class OrderReportService : IOrderReportService
         foreach (var clientId in customerIds.Distinct())
         {
             if (!_orderLogRepository.TryGetClientOrders(clientId, out var orders))
-            {
                 throw new ClientNotFoundException(clientId);
-            }
 
             reports.Add(BuildClientReport(clientId, orders));
         }

@@ -5,10 +5,10 @@ using HomeWork1.Domain.Models;
 namespace HomeWork1.Infrastructure.Repositories;
 
 /// <summary>
-/// Была попытка в потокобезопасность с возможным заделом "на будущее" - 
-/// - запись в файл и поддержка нескольких инстансов приложения
-/// Но конце концов стало выглядеть как оверинжиниринг и изобретение велосипеда,
-/// поэтому осталось как есть 
+///     Была попытка в потокобезопасность с возможным заделом "на будущее" -
+///     - запись в файл и поддержка нескольких инстансов приложения
+///     Но конце концов стало выглядеть как оверинжиниринг и изобретение велосипеда,
+///     поэтому осталось как есть
 /// </summary>
 public class OrderLogCsvRepository : IOrderLogRepository
 {
@@ -16,12 +16,12 @@ public class OrderLogCsvRepository : IOrderLogRepository
     private readonly object _sync = new();
 
     /// <summary>
-    /// Кэш заказов по клиентам, чтобы не читать файл сильно часто
+    ///     Кэш заказов по клиентам, чтобы не читать файл сильно часто
     /// </summary>
     private Dictionary<long, List<OrderRecord>>? _ordersByClientCached;
 
     /// <summary>
-    /// Хранит штамп файла, чтобы понимать, когда нужно пересобирать кэш.
+    ///     Хранит штамп файла, чтобы понимать, когда нужно пересобирать кэш.
     /// </summary>
     private (DateTimeOffset LastWriteUtc, long Length) _stamp;
 
@@ -34,10 +34,7 @@ public class OrderLogCsvRepository : IOrderLogRepository
     {
         lock (_sync)
         {
-            if (IsIndexStale())
-            {
-                RebuildIndex();
-            }
+            if (IsIndexStale()) RebuildIndex();
 
             if (_ordersByClientCached!.TryGetValue(clientId, out var clientOrders))
             {
@@ -62,16 +59,11 @@ public class OrderLogCsvRepository : IOrderLogRepository
         var ordersByClient = new Dictionary<long, List<OrderRecord>>();
         foreach (var line in File.ReadLines(_filePath))
         {
-            if (string.IsNullOrWhiteSpace(line) || line.StartsWith("client_id", StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
+            if (string.IsNullOrWhiteSpace(line) ||
+                line.StartsWith("client_id", StringComparison.OrdinalIgnoreCase)) continue;
 
             var columns = line.Split(',');
-            if (columns.Length < 5)
-            {
-                continue;
-            }
+            if (columns.Length < 5) continue;
 
             var record = new OrderRecord
             {
@@ -83,9 +75,7 @@ public class OrderLogCsvRepository : IOrderLogRepository
             };
 
             if (!ordersByClient.TryGetValue(record.ClientId, out var clientOrders))
-            {
                 ordersByClient[record.ClientId] = [];
-            }
 
             ordersByClient[record.ClientId].Add(record);
         }
@@ -99,5 +89,4 @@ public class OrderLogCsvRepository : IOrderLogRepository
         var info = new FileInfo(_filePath);
         return (info.LastWriteTimeUtc, info.Length);
     }
-
 }
