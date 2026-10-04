@@ -21,7 +21,7 @@ public class AppRunner
         
         var mode = "console"; // Default
         var toSkip = 0;
-        if (args.Length >= 2 && long.TryParse(args[0], out _))
+        if (args.Length >= 2 && !long.TryParse(args[0], out _))
         {
             mode = args[0];
             toSkip = 1;
