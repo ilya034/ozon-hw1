@@ -25,9 +25,9 @@ public class OrderLogCsvRepository : IOrderLogRepository
     /// </summary>
     private (DateTimeOffset LastWriteUtc, long Length) _stamp;
 
-    public OrderLogCsvRepository()
+    public OrderLogCsvRepository(string filePath)
     {
-        _filePath = ResolveCsvPath();
+        _filePath = filePath;
     }
 
     public bool TryGetClientOrders(long clientId, out IReadOnlyCollection<OrderRecord> orders)
@@ -100,24 +100,4 @@ public class OrderLogCsvRepository : IOrderLogRepository
         return (info.LastWriteTimeUtc, info.Length);
     }
 
-    /// <summary>
-    /// Ищет файл orders_log.csv в текущей директории и всех родительских директориях.
-    /// </summary>
-    private static string ResolveCsvPath()
-    {
-        var directory = new DirectoryInfo(Environment.CurrentDirectory);
-
-        while (directory is not null)
-        {
-            var candidate = Path.Combine(directory.FullName, "orders_log.csv");
-            if (File.Exists(candidate))
-            {
-                return candidate;
-            }
-
-            directory = directory.Parent;
-        }
-
-        throw new FileNotFoundException("orders_log.csv not found");
-    }
 }
