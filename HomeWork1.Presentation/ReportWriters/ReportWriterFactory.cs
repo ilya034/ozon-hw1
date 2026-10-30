@@ -4,7 +4,7 @@ namespace HomeWork1.Presentation.ReportWriters;
 
 public interface IReportWriterFactory
 {
-    IReportWriter Create(string mode);
+    IReportWriter Create(ReportOutputMode mode);
 }
 
 public class ReportWriterFactory : IReportWriterFactory
@@ -16,10 +16,10 @@ public class ReportWriterFactory : IReportWriterFactory
         _serviceProvider = serviceProvider;
     }
 
-    public IReportWriter Create(string mode)
+    public IReportWriter Create(ReportOutputMode mode)
     {
         return _serviceProvider.GetKeyedService<IReportWriter>(mode)
-               ?? throw new ArgumentException(
-                   $"Unknown output mode '{mode}'. Supported: '{ReportOutputModes.Console}', '{ReportOutputModes.File}'.");
+               ?? throw new ArgumentOutOfRangeException(nameof(mode), mode,
+                   $"No report writer registered for mode '{mode}'.");
     }
 }

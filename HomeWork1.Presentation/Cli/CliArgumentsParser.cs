@@ -6,9 +6,14 @@ namespace HomeWork1.Presentation.Cli;
 
 public static class CliArgumentsParser
 {
+    private static readonly string[] SupportedModes =
+        Enum.GetNames<ReportOutputMode>()
+            .Select(name => name.ToLowerInvariant())
+            .ToArray();
+
     public static string Usage { get; } =
-        $"Использование: HomeWork1 [{string.Join("|", ReportOutputModes.All)}] <client-id>...{Environment.NewLine}" +
-        $"  Режим вывода необязателен, по умолчанию {ReportOutputModes.Console}.";
+        $"Использование: HomeWork1 [{string.Join("|", SupportedModes)}] <client-id>...{Environment.NewLine}" +
+        $"  Режим вывода необязателен, по умолчанию {nameof(ReportOutputMode.Console).ToLowerInvariant()}.";
 
     public static bool TryParse(
         IReadOnlyList<string> args,
@@ -17,17 +22,16 @@ public static class CliArgumentsParser
     {
         options = null;
 
-        var mode = ReportOutputModes.Console;
+        var mode = ReportOutputMode.Console;
         var idsStart = 0;
 
         if (args.Count > 0 && !TryParseClientId(args[0], out _))
         {
-            mode = args[0];
             idsStart = 1;
 
-            if (!ReportOutputModes.All.Contains(mode))
+            if (!TryParseOutputMode(args[0], out mode))
             {
-                error = $"Неизвестный режим вывода '{mode}'. Допустимые: {string.Join(", ", ReportOutputModes.All)}.";
+                error = $"Неизвестный режим вывода '{args[0]}'. Допустимые: {string.Join(", ", SupportedModes)}.";
                 return false;
             }
         }
@@ -53,6 +57,12 @@ public static class CliArgumentsParser
         options = new CliOptions(mode, clientIds);
         error = null;
         return true;
+    }
+
+    private static bool TryParseOutputMode(string value, out ReportOutputMode mode)
+    {
+        return Enum.TryParse(value, ignoreCase: true, out mode)
+               && string.Equals(value, mode.ToString(), StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool TryParseClientId(string value, out long clientId)
