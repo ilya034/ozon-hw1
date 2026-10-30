@@ -1,5 +1,4 @@
 using HomeWork1.Application.Abstractions;
-using HomeWork1.Application.Exceptions;
 using HomeWork1.Presentation.Cli;
 using HomeWork1.Presentation.ReportWriters;
 
@@ -26,17 +25,9 @@ public class AppRunner
         }
 
         var writer = _reportWriterFactory.Create(options.OutputMode);
+        var reports = _orderReportService.GetReportForCustomers(options.ClientIds);
 
-        try
-        {
-            var reports = _orderReportService.GetReportForCustomers(options.ClientIds);
-            writer.Write(reports);
-            return Task.FromResult(0);
-        }
-        catch (ClientNotFoundException ex)
-        {
-            Console.Error.WriteLine(ex.Message);
-            return Task.FromResult(1);
-        }
+        writer.Write(reports);
+        return Task.FromResult(0);
     }
 }
