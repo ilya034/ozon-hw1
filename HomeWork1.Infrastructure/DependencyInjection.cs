@@ -8,7 +8,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, string orderLogPath)
     {
-        services.AddSingleton<IOrderLogRepository>(new OrderLogCsvRepository(orderLogPath));
+        services.Configure<OrderLogCsvOptions>(options => options.FilePath = orderLogPath);
+        services.AddSingleton<IOrderLogRepository, OrderLogCsvRepository>();
         return services;
     }
 }

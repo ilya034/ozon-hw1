@@ -1,6 +1,7 @@
 using System.Globalization;
 using HomeWork1.Application.Abstractions;
 using HomeWork1.Domain.Models;
+using Microsoft.Extensions.Options;
 
 namespace HomeWork1.Infrastructure.Repositories;
 
@@ -25,9 +26,9 @@ public class OrderLogCsvRepository : IOrderLogRepository
     /// </summary>
     private (DateTimeOffset LastWriteUtc, long Length) _stamp;
 
-    public OrderLogCsvRepository(string filePath)
+    public OrderLogCsvRepository(IOptions<OrderLogCsvOptions> options)
     {
-        _filePath = filePath;
+        _filePath = options.Value.FilePath;
     }
 
     public bool TryGetClientOrders(long clientId, out IReadOnlyCollection<OrderRecord> orders)
