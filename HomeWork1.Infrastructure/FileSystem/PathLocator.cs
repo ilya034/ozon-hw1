@@ -3,11 +3,16 @@ namespace HomeWork1.Infrastructure.FileSystem;
 public static class PathLocator
 {
     /// <summary>
-    ///     Ищет файл в текущей и родительских директориях.
+    ///     Ищет файл в стартовой директории и её родителях.
     /// </summary>
-    public static string? FindFileUpwards(string fileName)
+    /// <param name="fileName">Имя искомого файла.</param>
+    /// <param name="startDirectory">С какой директории начинать. По умолчанию — текущая директория процесса.</param>
+    /// <returns>Полный путь к найденному файлу или <c>null</c>.</returns>
+    public static string? FindFileUpwards(string fileName, string? startDirectory = null)
     {
-        var directory = new DirectoryInfo(Environment.CurrentDirectory);
+        ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
+
+        var directory = new DirectoryInfo(startDirectory ?? Environment.CurrentDirectory);
 
         while (directory is not null)
         {

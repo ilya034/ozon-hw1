@@ -1,4 +1,6 @@
 using HomeWork1.Application.Abstractions;
+using HomeWork1.Application.Exceptions;
+using HomeWork1.Presentation.Cli;
 using HomeWork1.Presentation.ReportWriters;
 
 namespace HomeWork1.Presentation;
@@ -14,33 +16,27 @@ public class AppRunner
         _reportWriterFactory = reportWriterFactory;
     }
 
-    public Task RunAsync()
+    public Task<int> RunAsync(IReadOnlyList<string> args)
     {
-        var args = Environment.GetCommandLineArgs().Skip(1).ToArray();
-        
-        var mode = ReportOutputModes.Console; // Default
-        var toSkip = 0;
-        if (args.Length >= 2 && !long.TryParse(args[0], out _))
+        if (!CliArgumentsParser.TryParse(args, out var options, out var error))
         {
-            mode = args[0];
-            toSkip = 1;
+            Console.Error.WriteLine(error);
+            Console.Error.WriteLine(CliArgumentsParser.Usage);
+            return Task.FromResult(1);
         }
 
-        var customerIds = args.Skip(toSkip)
-            .Select(ParseClientId)
-            .ToArray();
+        var writer = _reportWriterFactory.Create(options.OutputMode);
 
-        var writer = _reportWriterFactory.Create(mode);
-        var reports = _orderReportService.GetReportForCustomers(customerIds);
-
-        writer.Write(reports);
-        return Task.CompletedTask;
-    }
-
-    private static long ParseClientId(string value)
-    {
-        if (!long.TryParse(value, out var clientId)) throw new ArgumentException($"Invalid client id: {value}");
-
-        return clientId;
+        try
+        {
+            var reports = _orderReportService.GetReportForCustomers(options.ClientIds);
+            writer.Write(reports);
+            return Task.FromResult(0);
+        }
+        catch (ClientNotFoundException ex)
+        {
+            Console.Error.WriteLine(ex.Message);
+            return Task.FromResult(1);
+        }
     }
 }

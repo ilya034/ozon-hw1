@@ -4,4 +4,6 @@ public static class ReportOutputModes
 {
     public const string Console = "console";
     public const string File = "file";
+
+    public static readonly IReadOnlyCollection<string> All = [Console, File];
 }

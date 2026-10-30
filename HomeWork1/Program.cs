@@ -4,8 +4,16 @@ using HomeWork1.Infrastructure.FileSystem;
 using HomeWork1.Presentation;
 using Microsoft.Extensions.DependencyInjection;
 
-var orderLogPath = PathLocator.FindFileUpwards("orders_log.csv")
-                   ?? throw new FileNotFoundException("orders_log.csv not found");
+const string orderLogFileName = "orders_log.csv";
+
+var orderLogPath = PathLocator.FindFileUpwards(orderLogFileName);
+if (orderLogPath is null)
+{
+    Console.Error.WriteLine(
+        $"Файл {orderLogFileName} не найден в '{Environment.CurrentDirectory}' и родительских папках.");
+    return 1;
+}
+
 var reportOutputDirectory = Path.GetDirectoryName(orderLogPath)!;
 
 var services = new ServiceCollection();
@@ -17,4 +25,4 @@ services.AddPresentation(reportOutputDirectory);
 await using var serviceProvider = services.BuildServiceProvider();
 
 var app = serviceProvider.GetRequiredService<AppRunner>();
-await app.RunAsync();
+return await app.RunAsync(args);
