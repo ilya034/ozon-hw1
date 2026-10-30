@@ -1,6 +1,6 @@
 using HomeWork1.Domain.Models;
 
-namespace HomeWork1.Application.Abstractions;
+namespace HomeWork1.Presentation.ReportWriters;
 
 public interface IReportWriter
 {

@@ -1,7 +1,7 @@
-using HomeWork1.Application.Abstractions;
 using HomeWork1.Domain.Models;
+using HomeWork1.Presentation.Formatting;
 
-namespace HomeWork1.Infrastructure.ReportWriter;
+namespace HomeWork1.Presentation.ReportWriters;
 
 public class FileReportWriter : IReportWriter
 {
@@ -18,7 +18,7 @@ public class FileReportWriter : IReportWriter
         var outputPath = Path.Combine(_outputDirectory, fileName);
 
         var lines = reports
-            .Select(report => report.ToString())
+            .Select(ClientOrderReportFormatter.Format)
             .ToArray();
 
         File.WriteAllLines(outputPath, lines);
