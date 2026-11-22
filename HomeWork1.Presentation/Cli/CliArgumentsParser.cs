@@ -4,69 +4,55 @@ using HomeWork1.Presentation.ReportWriters;
 
 namespace HomeWork1.Presentation.Cli;
 
-public static class CliArgumentsParser
+public class CliArgumentsParser : ICliArgumentsParser
 {
-    private static readonly string[] SupportedModes =
-        Enum.GetNames<ReportOutputMode>()
-            .Select(name => name.ToLowerInvariant())
-            .ToArray();
+    private static readonly Dictionary<string, ReportOutputMode> Modes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["console"] = ReportOutputMode.Console,
+        ["file"] = ReportOutputMode.File
+    };
 
-    public static string Usage { get; } =
-        $"Использование: HomeWork1 [{string.Join("|", SupportedModes)}] <client-id>...{Environment.NewLine}" +
-        $"  Режим вывода необязателен, по умолчанию {nameof(ReportOutputMode.Console).ToLowerInvariant()}.";
+    public string Usage { get; } =
+        $"Использование: HomeWork1 [{string.Join("|", Modes.Keys)}] <client-id>...{Environment.NewLine}" +
+        "  Режим вывода необязателен, по умолчанию console.";
 
-    public static bool TryParse(
+    public bool TryParse(
         IReadOnlyList<string> args,
-        [NotNullWhen(true)] out CliOptions? options,
+        [NotNullWhen(true)] out CliArguments? arguments,
         [NotNullWhen(false)] out string? error)
     {
-        options = null;
+        arguments = null;
 
         var mode = ReportOutputMode.Console;
-        var idsStart = 0;
+        IEnumerable<string> rawIds = args;
 
-        if (args.Count > 0 && !TryParseClientId(args[0], out _))
+        if (args.Count > 0 && Modes.TryGetValue(args[0], out var parsedMode))
         {
-            idsStart = 1;
-
-            if (!TryParseOutputMode(args[0], out mode))
-            {
-                error = $"Неизвестный режим вывода '{args[0]}'. Допустимые: {string.Join(", ", SupportedModes)}.";
-                return false;
-            }
+            mode = parsedMode;
+            rawIds = args.Skip(1);
         }
 
-        if (args.Count == idsStart)
-        {
-            error = "Не указан ни один ID клиента.";
-            return false;
-        }
+        var clientIds = new List<long>();
 
-        var clientIds = new List<long>(args.Count - idsStart);
-        for (var i = idsStart; i < args.Count; i++)
+        foreach (var arg in rawIds)
         {
-            if (!TryParseClientId(args[i], out var clientId))
+            if (!long.TryParse(arg, NumberStyles.Integer, CultureInfo.InvariantCulture, out var clientId))
             {
-                error = $"Некорректный ID клиента: '{args[i]}'. Ожидается целое число.";
+                error = $"Некорректный ID клиента: '{arg}'. Ожидается целое число.";
                 return false;
             }
 
             clientIds.Add(clientId);
         }
 
-        options = new CliOptions(mode, clientIds);
+        if (clientIds.Count == 0)
+        {
+            error = "Не указан ни один ID клиента.";
+            return false;
+        }
+
+        arguments = new CliArguments(mode, clientIds);
         error = null;
         return true;
-    }
-
-    private static bool TryParseOutputMode(string value, out ReportOutputMode mode)
-    {
-        return Enum.TryParse(value, ignoreCase: true, out mode)
-               && string.Equals(value, mode.ToString(), StringComparison.OrdinalIgnoreCase);
-    }
-
-    private static bool TryParseClientId(string value, out long clientId)
-    {
-        return long.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out clientId);
     }
 }
