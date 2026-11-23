@@ -2,11 +2,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HomeWork1.Presentation.ReportWriters;
 
-public interface IReportWriterFactory
-{
-    IReportWriter Create(ReportOutputMode mode);
-}
-
 public class ReportWriterFactory : IReportWriterFactory
 {
     private readonly IServiceProvider _serviceProvider;

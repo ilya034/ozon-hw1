@@ -17,7 +17,10 @@ public static class PathLocator
         while (directory is not null)
         {
             var candidate = Path.Combine(directory.FullName, fileName);
-            if (File.Exists(candidate)) return candidate;
+            if (File.Exists(candidate))
+            {
+                return candidate;
+            }
 
             directory = directory.Parent;
         }

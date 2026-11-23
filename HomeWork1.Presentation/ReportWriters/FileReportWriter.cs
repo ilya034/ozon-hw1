@@ -1,4 +1,4 @@
-using HomeWork1.Domain.Models;
+using HomeWork1.Application.Models;
 using HomeWork1.Presentation.Formatting;
 using Microsoft.Extensions.Options;
 

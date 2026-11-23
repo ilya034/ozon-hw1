@@ -1,5 +1,5 @@
 using System.Globalization;
-using HomeWork1.Domain.Models;
+using HomeWork1.Application.Models;
 
 namespace HomeWork1.Presentation.Formatting;
 
